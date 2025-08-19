@@ -1,0 +1,67 @@
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import HamburgerMenu from '../components/HamburgerMenu';
+import Card from '../components/Card';
+import Profile from '../components/Profile';
+
+export default function Home() {
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.topBar}>
+        <HamburgerMenu />
+        <Profile />
+      </View>
+
+      <View style={styles.header}>
+        <Text style={styles.title}>PracticePath</Text>
+        <Text style={styles.subtitle}>Welcome back, -Name-!</Text>
+      </View>
+
+      <View style={styles.cards}>
+        <Card title="Goals" description="These are your goals" />
+        <Card title="Practice Log" description="Log today's practice." />
+        <Card title="Progress" description="See how you're doing this week" />
+        <Card title="Streak" description="You have a -- day streak!" />
+      </View>
+
+      
+
+    </ScrollView>
+
+    
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  header: {
+    display: 'flex',
+    marginBottom: 30,
+    flex: 1, 
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  title: {
+    fontSize: 40,
+    fontWeight: 'bold',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#555',
+  },
+  cards: {
+    marginBottom: 40,
+  },
+  profile: {
+    marginBottom: 20,
+  },
+});

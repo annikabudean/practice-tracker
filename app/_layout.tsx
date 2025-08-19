@@ -1,29 +1,54 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { Session } from '@supabase/supabase-js';
+import { Stack, useRouter, useSegments } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Alert, Button, TextInput, View, Text } from 'react-native';
+import { supabase } from '../lib/supabaseClient';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+export default function Layout() {
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  const segments = useSegments();
+  const router = useRouter();
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
+  // Load initial session
+  useEffect(() => {
+    const init = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Session error:', error);
+      } else {
+        setSession(data.session);
+      }
+      setLoading(false);
+    };
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+    init();
+
+    // Auth change listener
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  // Handle redirect after session is loaded
+  useEffect(() => {
+    if (loading) return;
+
+    const inAuthGroup = segments[0] === '(auth)'; // e.g. /login, /register
+    if (!session && !inAuthGroup) {
+      router.replace('/login'); // Not logged in → login page
+
+    } else if (session && inAuthGroup) {
+      router.replace('/home'); // Logged in → app
+    }
+  }, [session, loading, segments]);
+
+  if (loading) return <Text>Loading...</Text>;
+
+  return <Stack />;
 }
