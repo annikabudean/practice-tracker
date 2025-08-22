@@ -28,7 +28,7 @@ export default function HamburgerMenu() {
 
             <View style={styles.links}>
               <Link onPress={() => setIsOpen(false)} href="/home" style={styles.linkText}>Home</Link>
-              <Link onPress={() => setIsOpen(false)} href="/log" style={styles.linkText}>Log</Link>
+              <Link onPress={() => setIsOpen(false)} href="/notes" style={styles.linkText}>Notes</Link>
               <Link onPress={() => setIsOpen(false)} href="/history" style={styles.linkText}>History</Link>
             </View>
           </View>

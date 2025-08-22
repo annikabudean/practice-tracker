@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import HamburgerMenu from '../components/HamburgerMenu';
 import Card from '../components/Card';
 import Profile from '../components/Profile';
+import Footer from '../components/Footer';
+
+
 
 export default function Home() {
+  const [activePage, setActivePage] = useState("home")
+  
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+
+    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.scrollContent}>
       <View style={styles.topBar}>
         <HamburgerMenu />
         <Profile />
@@ -24,9 +31,15 @@ export default function Home() {
         <Card title="Streak" description="You have a -- day streak!" />
       </View>
 
-      
+      </ScrollView>
 
-    </ScrollView>
+      <View>
+        <Footer activePage={activePage} setActivePage={setActivePage}/>
+      </View>
+
+
+
+    </View>
 
     
   );
@@ -34,8 +47,12 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    flex: 1,
     backgroundColor: '#fff',
+  },
+   scrollContent: {
+    padding: 20,
+    paddingBottom: 80, // give space so footer doesn't cover content
   },
   topBar: {
     flexDirection: 'row',
@@ -59,7 +76,7 @@ const styles = StyleSheet.create({
     color: '#555',
   },
   cards: {
-    marginBottom: 40,
+    marginBottom: 50,
   },
   profile: {
     marginBottom: 20,

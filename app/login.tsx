@@ -19,13 +19,11 @@ export default function Auth() {
       password: password,
     })
 
-    console.log("where am i")
     if (error) {
       console.error("Login failed:", error.message);
       window.alert(error.message)
 
     }
-    console.log("where am i in error")
     setLoading(false)
     router.replace('/home');
   }
