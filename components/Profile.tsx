@@ -15,6 +15,7 @@ export default function Profile() {
         console.error("Error signing out: ", error.message);
       } else {
         console.log("Signed off successfully.")
+        router.replace('/login')
       }
     }
     catch (error) {
@@ -25,7 +26,7 @@ export default function Profile() {
   return (
     <View style={styles.container}>
         <TouchableOpacity onPress={() => setMenuVisible(true)}>
-        <Ionicons name="person-circle-outline" size={40} color="#333" />
+        <Ionicons name="person-circle-outline" size={35} color="#333" />
       </TouchableOpacity>
       <Modal
         transparent

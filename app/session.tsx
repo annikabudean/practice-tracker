@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Stack } from "expo-router";
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import HamburgerMenu from '../components/HamburgerMenu';
 import Card from '../components/Card';
@@ -11,8 +12,9 @@ export default function Session() {
 
     return (
         <View style={styles.container}>
+          <Stack.Screen options={{ headerShown: false }} />
 
-            <Text> Hi </Text>
+            <Text> hello </Text>
 
             <Footer activePage={activePage} setActivePage={setActivePage} />
 

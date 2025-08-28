@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { Stack } from "expo-router";
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import HamburgerMenu from '../components/HamburgerMenu';
 import Card from '../components/Card';
 import Profile from '../components/Profile';
 import Footer from '../components/Footer';
+import { theme } from "../theme/theme";
 
 
 
@@ -11,11 +13,10 @@ export default function Home() {
   const [activePage, setActivePage] = useState("home")
   
   return (
-
     <View style={styles.container}>
+    <Stack.Screen options={{ headerShown: false }} />
     <ScrollView contentContainerStyle={styles.scrollContent}>
       <View style={styles.topBar}>
-        <HamburgerMenu />
         <Profile />
       </View>
 
@@ -37,8 +38,6 @@ export default function Home() {
         <Footer activePage={activePage} setActivePage={setActivePage}/>
       </View>
 
-
-
     </View>
 
     
@@ -48,7 +47,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background[100],
   },
    scrollContent: {
     padding: 20,
@@ -56,7 +55,7 @@ const styles = StyleSheet.create({
   },
   topBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     paddingVertical: 10,
   },
@@ -70,10 +69,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 40,
     fontWeight: 'bold',
+    color: theme.colors.text[900]
   },
   subtitle: {
     fontSize: 16,
-    color: '#555',
+    color: theme.colors.text[500],
   },
   cards: {
     marginBottom: 50,

@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import { Alert, StyleSheet, View } from 'react-native'
+import React, { useState } from 'react'
+import { Alert, StyleSheet, View, Button, TextInput } from 'react-native'
 import { supabase } from '../lib/supabaseClient'
-import { Button, Input } from 'react-native-elements'
 import { useRouter } from 'expo-router';
-;
 
-export default function Auth() {
-  const router = useRouter()
+export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const router = useRouter();
 
   async function signInWithEmail() {
     setLoading(true)
@@ -19,53 +17,43 @@ export default function Auth() {
       password: password,
     })
 
-    if (error) {
-      console.error("Login failed:", error.message);
-      window.alert(error.message)
-
-    }
+    if (error) Alert.alert(error.message)
     setLoading(false)
-    router.replace('/home');
+
+    if (error) {
+      Alert.alert(error.message)
+    } else {
+      // Redirect to homepage after successful login
+      router.replace('/home') 
+    }
   }
 
   async function signUpWithEmail() {
-  if (!email || !email.includes('@')) {
-    window.alert('Please enter a valid email');
-    return;
+    setLoading(true)
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      
+      // options: {
+      //   data: {
+      //     first_name: first_name,
+      //     last_name: last_name,
+      //   }
+      // }
+    })
+
+    if (error) Alert.alert(error.message)
+    if (!session) Alert.alert('Please check your inbox for email verification!')
+    setLoading(false)
   }
-  if (!password || password.length < 6) {
-    window.alert('Password must be at least 6 characters');
-    return;
-  }
-
-  setLoading(true);
-
-  const { data, error } = await supabase.auth.signUp({
-    email: email.trim(),
-    password,
-  });
-
-  setLoading(false);
-
-  if (error) {
-    console.error('SignUp error:', error);
-    window.alert(error.message);
-    return;
-  }
-
-  if (!data.session) {
-    Alert.alert('Please check your email for confirmation');
-  } else {
-    router.replace('/home');
-  }
-}
 
   return (
     <View style={styles.container}>
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input
-          label="Email"
-          leftIcon={{ type: 'font-awesome', name: 'envelope' }}
+        <TextInput
           onChangeText={(text) => setEmail(text)}
           value={email}
           placeholder="email@address.com"
@@ -73,9 +61,7 @@ export default function Auth() {
         />
       </View>
       <View style={styles.verticallySpaced}>
-        <Input
-          label="Password"
-          leftIcon={{ type: 'font-awesome', name: 'lock' }}
+        <TextInput
           onChangeText={(text) => setPassword(text)}
           value={password}
           secureTextEntry={true}
@@ -92,6 +78,7 @@ export default function Auth() {
     </View>
   )
 }
+
 const styles = StyleSheet.create({
   container: {
     marginTop: 40,
