@@ -1,15 +1,16 @@
 import { supabase } from '@/lib/supabaseClient';
+import { getCurrentUserId } from "@/services/supabaseHelpers";
 import { Stack } from "expo-router";
-import { getCurrentUserId } from "@/lib/supabaseHelpers";
 import React, { useEffect, useState } from 'react';
-import { Button, FlatList, Keyboard, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View, } from 'react-native';
-import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import { ScrollView, Button, FlatList, Keyboard, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View, } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Footer from '../components/Footer';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { theme } from "../theme/theme";
+import { getUserNotes, addNote, editNote, deleteNote } from '../services/notesService'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-interface Note {
+export interface Note {
   id: number;
   notes: string;
   date: string;
@@ -23,6 +24,7 @@ export default function Notes() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
 
+  
   useEffect(() => {
     async function loadNotes() {
       const userNotes = await getUserNotes();
@@ -31,54 +33,6 @@ export default function Notes() {
     loadNotes();
   }, [notes]);
 
-
-  // Function to add a user's note to the database
-  async function addNote(note: string) {
-      const user_id = await getCurrentUserId();
-      if (!user_id) return;
-
-      const { data, error } = await supabase
-        .from("practice_notes")
-        .insert([{ notes: note, date: new Date(), user_id }])
-        .select(); 
-
-      if (error) console.error("Error adding note:", error.message);
-      else console.log("Inserted note:", data); 
-    }
-
-  // Function to retrieve the current users notes from the database
-  async function getUserNotes() {
-    const user_id = await getCurrentUserId();
-    if (!user_id) return [];
-
-    const { data, error } = await supabase
-      .from("practice_notes")
-      .select("*")
-      .eq("user_id", user_id) // only rows matching current user
-      .order("date", { ascending: false }); // newest first
-
-    if (error) console.error("Error fetching notes:", error.message);
-    else return data;
-  }
-
-  // Function to edit a note
-  async function editNote(noteId: number, updatedText: string) {
-    const user_id = await getCurrentUserId();
-    if (!user_id) return [];
-
-    const { data, error } = await supabase
-      .from("practice_notes")
-      .update({ notes: updatedText, date: new Date() })
-      .eq("id", noteId)
-      .select();
-
-      if (error) {
-        console.error("Error updating note: ", error.message);
-        return null;
-      }
-
-      return data ? data[0] : null;
-  }
 
   async function handleEdit(note: Note) {
     setEditingNoteId(note.id)
@@ -101,31 +55,11 @@ export default function Notes() {
     setText("");
   }
 
-  async function handleDelete(note: Note) {
-    const user_id = await getCurrentUserId();
-    if (!user_id) return [];
-
-    const { data, error } = await supabase
-      .from("practice_notes")
-      .delete()
-      .eq("id", note.id);
-
-      console.log("Data here: ", data)
-      if (error) {
-        console.error("Error deleting note: ", error.message);
-        return null;
-      }
-      else {
-        console.log("Note successfully deleted")
-      }
-
-    
-  }
 
   const renderRightActions = (note: Note) => {
     return (
       <View style={styles.deleteContainer}>
-        <Pressable style={styles.deleteButton} onPress={() => handleDelete(note)}>
+        <Pressable style={styles.deleteButton} onPress={() => deleteNote(note)}>
           <Text style={styles.deleteText}>Delete</Text>
         </Pressable>
       </View>
@@ -174,6 +108,16 @@ export default function Notes() {
         <KeyboardAvoidingView 
           style={styles.modalContainer}
           behavior={Platform.OS === "ios" ? "padding": "height"}>
+
+            <ScrollView 
+            contentContainerStyle={{ flexGrow: 1}}
+            keyboardDismissMode='on-drag'>
+            <View style={styles.modalHeader}>
+              <Pressable onPress={() => setModalVisible(false)}>
+                  <MaterialIcons name="arrow-back-ios-new" size={20}/>
+              </Pressable>
+            </View>
+
             <TextInput
               style={styles.textInput}
               placeholder="Type your practice notes..."
@@ -183,10 +127,8 @@ export default function Notes() {
               onChangeText={setText}
               //onSubmitEditing={() => handleSave(text)}
             />
-            <Pressable onPress={Keyboard.dismiss}>
-              <Text>Done</Text>
-            </Pressable>
             <Button title="Save" onPress={() => handleSave(text)}/>
+              </ScrollView>
         </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
       </Modal>
@@ -214,11 +156,11 @@ const styles = StyleSheet.create({
   textInput: {
     textAlignVertical: 'top',
     fontSize: 18,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
+    //borderWidth: 1,
+    //borderColor: '#ccc',
+    //borderRadius: 8,
     padding: 10,
-    height: 50,
+    //height: 500,
   },
     card: {
     backgroundColor: 'white',
@@ -234,7 +176,7 @@ const styles = StyleSheet.create({
   },
     list: {
       //flex: 1,
-      paddingTop: 20,
+      paddingTop: 50,
       paddingLeft: 20, 
       paddingRight: 20,
       //paddingBottom: 80,
@@ -291,6 +233,15 @@ const styles = StyleSheet.create({
   deleteText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+  },
+  backButton: {
+    fontSize: 16,
+    color: "blue",
   },
 });
 

@@ -1,13 +1,11 @@
-import React from 'react';
-import { useState } from "react";
-import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from "expo-router";
-import { Dispatch, SetStateAction } from "react";
-import Foundation from 'react-native-vector-icons/Foundation';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import React, { Dispatch, SetStateAction } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import { theme } from "../theme/theme";
+import Foundation from 'react-native-vector-icons/Foundation';
 import { Icon } from 'react-native-vector-icons/Icon';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { theme } from "../theme/theme";
 
 type FooterProps = {
   activePage: string;
@@ -36,12 +34,12 @@ export default function Footer({ activePage, setActivePage }: FooterProps) {
       key: "home",
     },
     {
-      label: "Start Session",
+      label: "Practice Sessions",
       iconName: "play-circle-outline",
       activeIconName: "play-circle-sharp",
       iconType: "Ionicons",
-      screen: "/session",
-      key: "session",
+      screen: "/practiceSession",
+      key: "practiceSession",
     },
     {
       label: "Notes",
@@ -65,7 +63,7 @@ export default function Footer({ activePage, setActivePage }: FooterProps) {
             key={btn.key}
             onPress={() => {
               setActivePage(btn.key);
-              router.replace(btn.screen); // use replace if you don't want back animation
+              router.replace(btn.screen);
             }}
             style={({ pressed }) => ({
               alignItems: "center",

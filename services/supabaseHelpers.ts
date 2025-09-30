@@ -1,4 +1,4 @@
-import { supabase } from "./supabaseClient";
+import { supabase } from "../lib/supabaseClient";
 
 export async function getCurrentUserId(): Promise<string | null> {
   const { data, error } = await supabase.auth.getUser();
